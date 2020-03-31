@@ -1,0 +1,65 @@
+esphome:
+
+  name: example
+  platform: ESP8266
+  board: esp12e
+  # 把需要包含的头文件放到与yaml配置文件同一目录下，在此填入文件名
+  includes: 
+    - customSwitches.h
+
+wifi:
+  ssid: "example"
+  password: "12345678"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "test Fallback Hotspot"
+    password: "jKmESQSwXjgR"
+
+captive_portal:
+
+# Enable logging
+# 用到了自定义日志，同样填写即可
+logger:
+  level: DEBUG
+  esp8266_store_log_strings_in_flash: False
+
+# Enable Home Assistant API
+api:
+  password: "12345678"
+
+ota:
+  password: "12345678"
+
+# uart字段，选择用于通信的引脚，波特率过高，软串口性能不佳可能出现传输错误
+uart:
+  id: uart_bus
+  tx_pin: 16
+  rx_pin: 5
+  baud_rate: 9600
+
+# switch字段，实际配置开关
+
+# lambda语句解释：
+# auto my_custom = new MyCustomComponent(8,id(uart_bus)); new一个自定义开关的实例，第一个参数是开关的数量，最大支持8个。第二个参数是之前定义的uart实例的id，同样填写即可。
+# App.register_component(my_custom); 注册组件，同样填写即可
+# return {&my_custom->switches[0]} 这里是返回列表，返回一串开关实例的指针，中间以逗号分隔，下标从零开始，总数与第一行中‘new MyCustomComponent(8,id(uart_bus));’填写的开关数量相同。
+switch:
+  - platform: custom
+    lambda: |-
+      auto my_custom = new MyCustomComponent(8,id(uart_bus));
+      App.register_component(my_custom);
+      return {&my_custom->switches[0],&my_custom->switches[1],&my_custom->switches[2],&my_custom->switches[3],&my_custom->switches[4],&my_custom->switches[5],&my_custom->switches[6],&my_custom->switches[7]};
+
+# 下面是各个开关的属性，参照官方文档中的属性，注意个数必须和前面‘new MyCustomComponent(8,id(uart_bus));’中传入的开关数量一致
+    switches:
+      - name: "My Custom Switches1"
+      - name: "My Custom Switches2"
+      - name: "My Custom Switches3"
+      - name: "My Custom Switches4"
+      - name: "My Custom Switches5"
+      - name: "My Custom Switches6"
+      - name: "My Custom Switches7"
+      - name: "My Custom Switches8"
+
+  
